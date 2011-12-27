@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ["François Beausoleil"]
   s.email       = ["francois@teksol.info"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{Low-level library to access a Sony PRS-T1 database}
+  s.description = %q{Low-level library to access a Sony PRS-T1 database}
 
   s.rubyforge_project = "sony_reader"
 
