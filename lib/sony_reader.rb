@@ -1,4 +1,5 @@
 require "sony_reader/version"
+require "digest/md5"
 require "fileutils"
 require "pathname"
 require "sequel"
@@ -53,7 +54,8 @@ module SonyReader
     attr_reader :db, :reader_path
 
     def add_book(title, author, path_to_epub, path_to_thumbnail)
-      epub_path_on_device = reader_path + "Sony_Reader/media/books/#{Time.now.to_i}.epub"
+      fingerprint = Digest::MD5.hexdigest("#{title}:#{author}")
+      epub_path_on_device = reader_path + "Sony_Reader/media/books/#{fingerprint}.epub"
 
       db.transaction do
         epub_path_on_device.dirname.mkpath
