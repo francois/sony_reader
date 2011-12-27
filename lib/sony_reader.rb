@@ -12,36 +12,38 @@ rescue LoadError
   # NOP: Ignore
 end
 
-# CREATE TABLE books (
-#     _id INTEGER PRIMARY KEY AUTOINCREMENT
-#   , title TEXT
-#   , author TEXT
-#   , kana_title TEXT
-#   , kana_author TEXT
-#   , title_key TEXT
-#   , author_key TEXT
-#   , source_id INTEGER
-#   , added_date INTEGER
-#   , modified_date INTEGER
-#   , reading_time INTEGER
-#   , purchased_date INTEGER
-#   , file_path TEXT
-#   , file_name TEXT
-#   , file_size INTEGER
-#   , thumbnail TEXT
-#   , mime_type TEXT
-#   , corrupted INTEGER
-#   , expiration_date INTEGER
-#   , prevent_delete INTEGER
-#   , sony_id TEXT
-#   , periodical_name TEXT
-#   , kana_periodical_name TEXT
-#   , periodical_name_key TEXT
-#   , publication_date INTEGER
-#   , conforms_to TEXT
-#   , description TEXT
-#   , logos TEXT);
 module SonyReader
+  # Works against this schema:
+  #
+  #   CREATE TABLE books (
+  #       _id INTEGER PRIMARY KEY AUTOINCREMENT
+  #     , title TEXT
+  #     , author TEXT
+  #     , kana_title TEXT
+  #     , kana_author TEXT
+  #     , title_key TEXT
+  #     , author_key TEXT
+  #     , source_id INTEGER
+  #     , added_date INTEGER
+  #     , modified_date INTEGER
+  #     , reading_time INTEGER
+  #     , purchased_date INTEGER
+  #     , file_path TEXT
+  #     , file_name TEXT
+  #     , file_size INTEGER
+  #     , thumbnail TEXT
+  #     , mime_type TEXT
+  #     , corrupted INTEGER
+  #     , expiration_date INTEGER
+  #     , prevent_delete INTEGER
+  #     , sony_id TEXT
+  #     , periodical_name TEXT
+  #     , kana_periodical_name TEXT
+  #     , periodical_name_key TEXT
+  #     , publication_date INTEGER
+  #     , conforms_to TEXT
+  #     , description TEXT
+  #     , logos TEXT);
   class Database
     def initialize(reader_path, db_path)
       @reader_path = Pathname.new(reader_path)
