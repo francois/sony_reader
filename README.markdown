@@ -3,7 +3,16 @@ This is a proof-of-concept attempt working with Sony's PRS-T1 eReader database. 
 Example
 -------
 
-Ensure you have ImageMagick's `convert` tool available on the path, and have installed this gem, then from Ruby (IRB works just fine):
+Ensure you have ImageMagick's `convert` tool available on the path, and have installed this gem, then:
+
+from the command line
+=====================
+
+    $ sreader PATH_TO_READER add --title="Book's Title" --author="Book's Author" --epub="path/to/epub" --cover="path/to-cover"
+
+
+from Ruby (IRB works just fine)
+===============================
 
     require "sony_reader"
 
