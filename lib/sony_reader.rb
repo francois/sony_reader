@@ -6,6 +6,8 @@ require "sequel"
 require "escape"
 require "logger"
 require "time"
+require "find"
+require "pp"
 
 begin
   require "ruby-debug"
@@ -53,6 +55,53 @@ module SonyReader
 
     attr_reader :db, :reader_path
 
+    COVER_EXTENSIONS = %w(jpg jpeg png).map(&:freeze).freeze
+
+    def sync(path_to_collection)
+      path_to_book_collection = Pathname.new(path_to_collection).expand_path
+      expected_books = Hash.new
+      path_to_book_collection.find do |pathname|
+        next unless pathname.extname == ".epub"
+        expected_books[pathname.basename.to_s.sub(/^\d+\s+/, "").sub(".epub", "")] = pathname
+      end
+
+      actual_books = book_titles.select_map(:title)
+      missing_books = expected_books.reject {|title, _| actual_books.include?(title)}
+      missing_books.each do |title, path_to_epub|
+        author = path_to_epub.relative_path_from(path_to_book_collection).to_s.split("/").first
+        extname = COVER_EXTENSIONS.detect {|extension| File.file?(path_to_epub.to_s.sub(".epub", ".#{extension}"))}
+        path_to_thumbnail = path_to_epub.to_s.sub(".epub", ".#{extname}")
+
+        add_book(title, author, path_to_epub.to_s, path_to_thumbnail.to_s)
+      end
+
+      book_collections = expected_books.select do |_, path_to_epub|
+        path_to_epub.relative_path_from(path_to_book_collection).to_s.split("/").length == 3
+      end.inject(Hash.new {|h,k| h[k] = []}) do |memo, (_, path_to_epub)|
+        collection_name = path_to_epub.relative_path_from(path_to_book_collection).to_s.split("/")[1]
+        memo[collection_name] << path_to_epub
+        memo
+      end
+
+      collection_ids = book_collections.keys.inject(Hash.new) do |memo, collection_name|
+        id = if collections.filter(:title => collection_name).select(:_id).any? then
+               collections.filter(:title => collection_name).select(:_id).first.fetch(:_id)
+             else
+               collections.insert(:title => collection_name, :source_id => 0)
+             end
+        memo[collection_name] = id
+        memo
+      end
+
+      collection_ids.each do |collection_name, id|
+        collection_books.filter(:collection_id => id).delete
+        book_collections[collection_name].sort_by(&:to_s).each do |path_to_epub|
+          order, title = path_to_epub.to_s.split("/").last.sub(".epub", "").split(" ", 2)
+          collection_books.insert(:collection_id => id, :added_order => order.to_i, :content_id => books.filter(:title => title).select(:_id).limit(1))
+        end
+      end
+    end
+
     def add_book(title, author, path_to_epub, path_to_thumbnail)
       fingerprint = Digest::MD5.hexdigest("#{title}:#{author}")
       epub_path_on_device = reader_path + "Sony_Reader/media/books/#{fingerprint}.epub"
@@ -88,6 +137,16 @@ module SonyReader
 
     def book_titles
       books.select(:title, :logos)
+    end
+
+    #     CREATE TABLE collection (_id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT,kana_title TEXT,source_id INTEGER,uuid TEXT);
+    def collections
+      db[:collection]
+    end
+
+    #     CREATE TABLE collections (_id INTEGER PRIMARY KEY AUTOINCREMENT,collection_id INTEGER,content_id INTEGER,added_order INTEGER);
+    def collection_books
+      db[:collections]
     end
   end
 

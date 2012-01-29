@@ -8,7 +8,42 @@ Ensure you have ImageMagick's `convert` tool available on the path, and have ins
 from the command line
 =====================
 
+If you have a collection of books, you can do sync them all up if they are in the proper hierarchy using:
+
+    $ sreader PATH_TO_READER sync PATH_TO_BOOK_COLLECTION
+
+The book collection is an on-disk database holding directories of authors, and books or series underneath. Lay out your directory structure like this:
+
+    PATH_TO_BOOK_COLLECTION/
+      David Eddings/
+        The Belgariad/
+          01 Pawn of Prophecy.epub
+          01 Pawn of Prophecy.jpeg
+          02 Queen of Sorcery.epub
+          02 Queen of Sorcery.png
+          ...
+
+        # Individual books can be added as well
+        The Redemption of Althalus.epub
+        The Redemption of Althalus.jpg
+
+      Terry Goodkind/
+        Sword of Truth/
+          01 Wizard's First Rule.epub
+          01 Wizard's First Rule.jpg
+          02 Stone of Tears.epub
+          02 Stone of Tears.jpg
+          ...
+
+`sreader` will only add books and collections which are missing. It does not yet handle data deletion. To delete anything, use your reader's UI.
+
+Cover images must have one of three extensions: jpg, jpeg or png.
+
+You can add single books to your reader using:
+
     $ sreader PATH_TO_READER add --title="Book's Title" --author="Book's Author" --epub="path/to/epub" --cover="path/to-cover"
+
+This will not manage the collections for you.
 
 
 from Ruby (IRB works just fine)

@@ -29,19 +29,27 @@ usage("PATH_TO_READER does not contain the book database: #{path_to_database.ins
 
 db = SonyReader::Database.new(path_to_reader, path_to_database)
 
-case command = nonoptions.shift
-when "add"
-  params = options.inject({}) {|memo, arg| memo[arg.split("=").first] = arg.split("=").last; memo}
-  usage("Missing --title= parameter from add subcommand in #{params.inspect}")  unless params["--title"]
-  usage("Missing --author= parameter from add subcommand in #{params.inspect}") unless params["--author"]
+result = case command = nonoptions.shift
+         when "add"
+           params = options.inject({}) {|memo, arg| memo[arg.split("=").first] = arg.split("=").last; memo}
+           usage("Missing --title= parameter from add subcommand in #{params.inspect}")  unless params["--title"]
+           usage("Missing --author= parameter from add subcommand in #{params.inspect}") unless params["--author"]
 
-  usage("Missing --epub= parameter from add subcommand in #{params.inspect}")   unless params["--epub"]
-  usage("Epub file #{params["--epub"].inspect} missing") unless File.file?(params.fetch("--epub"))
+           usage("Missing --epub= parameter from add subcommand in #{params.inspect}")   unless params["--epub"]
+           usage("Epub file #{params["--epub"].inspect} missing") unless File.file?(params.fetch("--epub"))
 
-  usage("Missing --cover= parameter from add subcommand in #{params.inspect}")  unless params["--cover"]
-  usage("Cover file #{params["--cover"].inspect} missing") unless File.file?(params.fetch("--cover"))
+           usage("Missing --cover= parameter from add subcommand in #{params.inspect}")  unless params["--cover"]
+           usage("Cover file #{params["--cover"].inspect} missing") unless File.file?(params.fetch("--cover"))
 
-  result = db.add_book(params.fetch("--title"), params.fetch("--author"), params.fetch("--epub"), params.fetch("--cover"))
-else
-  usage("Unknown command: #{command.inspect}")
-end
+           db.add_book(params.fetch("--title"), params.fetch("--author"), params.fetch("--epub"), params.fetch("--cover"))
+
+         when "sync"
+           path_to_book_collection = nonoptions.shift
+           usage("PATH_TO_BOOK_COLLECTION is not a directory: #{path_to_book_collection.inspect}") unless File.directory?(path_to_book_collection)
+           db.sync(path_to_book_collection)
+
+         else
+           usage("Unknown command: #{command.inspect}")
+         end
+
+# Maybe do something with result?
