@@ -63,9 +63,9 @@ module SonyReader
 
         key = books.insert(:title         => title,
                            :author        => author,
-                           :added_date    => Time.now.utc.to_i,
-                           :modified_date => Time.now.utc.to_i,
-                           :reading_time  => Time.parse("2011-01-01 00:00+0000").to_i,
+                           :added_date    => Time.now.utc.to_i * 1000,
+                           :modified_date => Time.now.utc.to_i * 1000,
+                           :reading_time  => Time.parse("2011-01-01 00:00+0000").to_i * 1000,
                            :file_path     => epub_path_on_device.relative_path_from(reader_path).to_s,
                            :file_name     => epub_path_on_device.basename.to_s,
                            :file_size     => File.size(path_to_epub),
